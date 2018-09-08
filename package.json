@@ -1,15 +1,15 @@
 {
-  "name": "electron-boilerplate",
-  "productName": "Electron Boilerplate",
-  "description": "Starter for your Electron application",
+  "name": "electron-technicolour-flash",
+  "productName": "Electron Technicolour Flash",
+  "description": "Flash tool for Technicolour modems",
   "version": "0.0.0",
   "private": true,
-  "author": "Mr. Gumby <mr.gumby@example.com>",
-  "copyright": "© 2017, Gumby inc.",
-  "homepage": "http://example.com",
+  "author": "Christof Bachhmann <code@christof-b.de>",
+  "copyright": "© 2018, Christof Bachmann",
+  "homepage": "http://chistof-b.de",
   "main": "app/background.js",
   "build": {
-    "appId": "com.example.electron-boilerplate",
+    "appId": "de.christof-b.electron-technicolour-flash",
     "files": [
       "app/**/*",
       "node_modules/**/*",
