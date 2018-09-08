@@ -1,4 +1,4 @@
-# electron-technicolour-flashh
+# electron-technicolour-flash
 
 An [Electron runtime](http://electron.atom.io) based flash tool for Technicolour modems.
 
