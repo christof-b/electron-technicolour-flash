@@ -4,13 +4,23 @@ import "./stylesheets/main.css";
 import "./helpers/context_menu.js";
 import "./helpers/external_links.js";
 
+// Bootstrap
+import "../node_modules/bootstrap/dist/js/bootstrap.bundle.js"
+import "../node_modules/bootstrap/dist/css/bootstrap.css"
+import jquery from "jquery";
+
 // ----------------------------------------------------------------------------
 // Everything below is just to show you how it works. You can delete all of it.
 // ----------------------------------------------------------------------------
 
-import { remote } from "electron";
+import {
+  remote,
+  ipcRenderer
+} from "electron";
 import jetpack from "fs-jetpack";
-import { greet } from "./hello_world/hello_world";
+import {
+  greet
+} from "./hello_world/hello_world";
 import env from "env";
 
 const app = remote.app;
@@ -26,10 +36,27 @@ const osMap = {
   linux: "Linux"
 };
 
-document.querySelector("#app").style.display = "block";
-document.querySelector("#greet").innerHTML = greet();
-document.querySelector("#os").innerHTML = osMap[process.platform];
-document.querySelector("#author").innerHTML = manifest.author;
-document.querySelector("#env").innerHTML = env.name;
-document.querySelector("#electron-version").innerHTML =
-  process.versions.electron;
+jquery('#start-button').click(function(ev) {
+  ev.preventDefault();
+  jquery('#intro').hide();
+  jquery('#form').show();
+  return false;
+});
+
+jquery('#inputChangeCommand').click(function() {
+  if (jquery('#inputChangeCommand').is(":checked")) {
+    jquery('#inputCommand').removeAttr('disabled');
+  } else {
+    jquery('#inputCommand').attr('disabled', 'disabled');
+  }
+});
+
+const dialog = remote.dialog;
+
+jquery('#run').click(function(ev) {
+  ev.preventDefault();
+  //ipcRenderer.send('open-error-dialog');
+  dialog.showErrorBox('Error', "Sorry, not implemented yet.")
+})
+
+jquery('#app').show();
