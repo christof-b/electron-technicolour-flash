@@ -1,15 +1,15 @@
-# electron-boilerplate
+# electron-technicolour-flashh
 
-A minimalistic boilerplate for [Electron runtime](http://electron.atom.io). Tested on Windows, macOS and Linux.  
+An [Electron runtime](http://electron.atom.io) based flash tool for Technicolour modems.
 
-This project contains only bare minimum of tooling and dependencies to provide you with simple to understand and extensible base (but still, this is fully functional Electron environment). The boilerplate also doesn't impose on you any frontend technologies, so feel free to pick your favourite.
+Based on [electron-boilerplate](https://github.com/szwacz/electron-boilerplate) and inspired by [autoflashgui](https://github.com/mswhirl/autoflashgui).
 
 # Quick start
 
 Make sure you have [Node.js](https://nodejs.org) installed, then type the following commands known to every Node developer...
 ```
-git clone https://github.com/szwacz/electron-boilerplate.git
-cd electron-boilerplate
+git clone https://github.com/christof-b/electron-technicolour-flash
+cd electron-technicolour-flash
 npm install
 npm start
 ```
@@ -36,36 +36,6 @@ The drawback of this design is that `app` folder contains some files which shoul
 ```
 npm start
 ```
-
-## The build pipeline
-
-Build process uses [Webpack](https://webpack.js.org/). The entry-points are `src/background.js` and `src/app.js`. Webpack will follow all `import` statements starting from those files and compile code of the whole dependency tree into one `.js` file for each entry point.
-
-[Babel](http://babeljs.io/) is also utilised, but mainly for its great error messages. Electron under the hood runs latest Chromium, hence most of the new JavaScript features are already natively supported.
-
-## Environments
-
-Environmental variables are done in a bit different way (not via `process.env`). Env files are plain JSONs in `config` directory, and build process dynamically links one of them as an `env` module. You can import it wherever in code you need access to the environment.
-```js
-import env from "env";
-console.log(env.name);
-```
-
-## Upgrading Electron version
-
-To do so edit `package.json`:
-```json
-"devDependencies": {
-  "electron": "2.0.2"
-}
-```
-*Side note:* [Electron authors recommend](http://electron.atom.io/docs/tutorial/electron-versioning/) to use fixed version here.
-
-## Adding npm modules to your app
-
-Remember to respect the split between `dependencies` and `devDependencies` in `package.json` file. Your distributable app will contain modules listed in `dependencies` after running the release script.
-
-*Side note:* If the module you want to use in your app is a native one (not pure JavaScript but compiled binary) you should first  run `npm install name_of_npm_module` and then `npm run postinstall` to rebuild the module for Electron. You need to do this once after you're first time installing the module. Later on, the postinstall script will fire automatically with every `npm install`.
 
 # Testing
 
