@@ -15,6 +15,8 @@ import {
 } from "electron";
 
 const dialog = remote.dialog;
+const fs = remote.require('fs');
+const appPath = process.env.NODE_ENV === 'production' ? remote.app.getAppPath() : __dirname;
 
 jquery('#start-button').click(function(ev) {
   ev.preventDefault();
@@ -33,7 +35,37 @@ jquery('#inputChangeCommand').click(function() {
 
 jquery('#run').click(function(ev) {
   ev.preventDefault();
-  dialog.showErrorBox('Error', "Sorry, not implemented yet.")
+  jquery('#form').hide();
+  const username = jquery('#inputUsername').val();
+  const password = jquery('#inputPassword').val();
+  const host = jquery('#inputTargetIP').val();
+  const webview = document.querySelector('webview');
+  let tries = 0;
+  webview.addEventListener('dom-ready', (event) => {
+
+    if (/login/.test(webview.getURL())) {
+      if (tries === 0) {
+        tries++;
+        fs.readFile(appPath + '/webview/inject.js', 'utf8', (err, data) => {
+          if (err) throw err;
+          data = data.replace(/##username##/gi, username);
+          data = data.replace(/##password##/gi, password);
+          webview.executeJavaScript(data);
+        });
+      } else {
+        console.log("AUTH FAILED!");
+      }
+    } else {
+      console.log("AUTH SUCCESS");
+      webview.loadURL('http://' + host + '/modals/gateway-modal.lp?action=upgradefw', {
+
+      })
+    }
+
+
+
+  });
+  webview.loadURL('http://' + host + '/login.lp');
 })
 
 jquery('#app').show();
