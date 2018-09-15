@@ -59,16 +59,13 @@ jquery('#run').click(function(ev) {
           data = data.replace(/##username##/gi, username);
           data = data.replace(/##password##/gi, password);
           webview.executeJavaScript(data);
-          console.log('Authenticating...');
+          jquery('#progress').append('<p class="text-info">Authenticating...</p>');
         });
       } else {
-        console.log("AUTH FAILED!");
+        jquery('#progress').append('<p class="text-danger">Auth failed!</p>');
       }
-    } else if (/gateway-modal/.test(webview.getURL())) {
-
-
     } else {
-      console.log("AUTH SUCCESS");
+      jquery('#progress').append('<p class="text-success">Auth successful</p>');
       webview.send('csrf-token-request');
     }
   });
@@ -76,7 +73,7 @@ jquery('#run').click(function(ev) {
   webview.addEventListener("ipc-message", function(e) {
     if (e.channel === "csrf-token-response") {
       const token = e.args[0];
-      const firmware = 'AGTHP_1.1.0_CLOSED.rbi';
+      const firmware = jquery('#inputFirmwareFileName').val();
       const firmwarePath = appPath + path.sep + 'firmware' + path.sep + firmware;
 
       const stats = fs.statSync(firmwarePath);
@@ -103,7 +100,7 @@ jquery('#run').click(function(ev) {
             console.log(info.name, info.value);
           }
 
-          console.log("Uploading firmware...");
+          jquery('#progress').append('<p class="text-info">Uploading firmware...</p>');
 
           (async () => {
             try {
@@ -117,29 +114,30 @@ jquery('#run').click(function(ev) {
               });
               const result = JSON.parse(response.body);
               if (result.success !== undefined && result.success) {
-                console.log("Upload successful!");
-                console.log("Waiting for reboot...");
+                jquery('#progress').append('<p class="text-success">Upload successful!</p>');
+                jquery('#progress').append('<p class="text-info">Waiting for reboot...</p>');
                 setTimeout(function() {
-                  console.log("Try to reconnect...");
+                  jquery('#progress').append('<p class="text-info">Try to reconnect...</p>');
                   (async () => {
                     await got('http://' + host, {
                       retry: {
                         retries: (retry, error) => {
-                          console.log('Retry #' + retry + ', waiting...')
+                          jquery('#progress').append('<p class="text-mute">Retry #' + retry + ', waiting...</p>')
                           return 5000;
                         }
                       }
                     });
-                    console.log("Ready to continue!");
+                    jquery('#progress').append('<p class="text-success">Ready to continue!</p>');
                     //TODO continue
                   })();
                 }, 120000);
               } else {
-                console.log("Upload failed:");
+                jquery('#progress').append('<p class="text-danger">Upload failed!</p>');
                 console.log(response.body);
                 console.log(result);
               }
             } catch (error) {
+              jquery('#progress').append('<p class="text-danger">An error occured!</p>');
               console.log(error);
               //=> 'Internal server error ...'
             }
@@ -149,6 +147,11 @@ jquery('#run').click(function(ev) {
       });
     }
   });
+
+  if (env.name !== "development") {
+    jquery('webview').hide();
+  }
+  jquery('#app').append('<div class="jumbotron mt-4" id="progress"><h1>Progress</h1><p class="text-info">Loading firmware...</p></div>');
 
   webview.loadURL('http://' + host + '/login.lp');
 })
