@@ -111,7 +111,7 @@
         <button type="submit" class="btn btn-primary" id="run">Run</button>
       </form>
     </div>
-    <webview src="" id="client" style="height: 800px;" autosize disablewebsecurity nodeintegration>
+    <webview src="" id="client" style="height: 800px;" autosize disablewebsecurity preload="./webview/ipc.js">
   </div>
 
   <script src="app.js"></script>
