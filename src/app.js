@@ -14,8 +14,6 @@ import {
   remote
 } from "electron";
 
-const ipc = electron.ipcRenderer;
-
 const dialog = remote.dialog;
 const fs = remote.require('fs');
 const appPath = process.env.NODE_ENV === 'production' ? remote.app.getAppPath() : __dirname;
@@ -25,6 +23,8 @@ import FormData from "form-data";
 import {
   CookieJar
 } from 'tough-cookie';
+
+import path from 'path';
 
 jquery('#start-button').click(function(ev) {
   ev.preventDefault();
@@ -77,56 +77,75 @@ jquery('#run').click(function(ev) {
     if (e.channel === "csrf-token-response") {
       const token = e.args[0];
       const firmware = 'AGTHP_1.1.0_CLOSED.rbi';
-      const firmwarePath = appPath + '/firmware/' + firmware;
-      const stats = fs.statSync(firmwarePath);
+      const firmwarePath = appPath + path.sep + 'firmware' + path.sep + firmware;
 
+      const stats = fs.statSync(firmwarePath);
       console.log(stats);
 
-      const form = new FormData();
-      form.append('CSRFtoken', token);
-      form.append('upgradefile', fs.createReadStream(firmwarePath));
-      const cookieJar = new CookieJar();
-      let session = webview.getWebContents().session;
+      fs.readFile(firmwarePath, (err, data) => {
 
-      session.cookies.get({
-        url: 'http://' + host
-      }, function(error, cookies) {
-        for (var i = 0; i < cookies.length; i++) {
-          let info = cookies[i];
-          cookieJar.setCookie(`${info.name}=${info.value};`, 'http://' + host, () => {});
-          console.log(info.name, info.value);
-        }
+        const form = new FormData({
+          maxDataSize: stats.size + 1024
+        });
+        form.append('CSRFtoken', token);
+        form.append('upgradefile', new Buffer(data, 'binary'), {
+          knownLength: stats.size
+        });
+        const cookieJar = new CookieJar();
+        let session = webview.getWebContents().session;
 
-        console.log("Uploading firmware...");
-
-        (async () => {
-          try {
-            const response = await got.post('/modals/gateway-modal.lp?action=upgradefw', {
-              cookieJar: cookieJar,
-              baseUrl: 'http://' + host,
-              body: form,
-              agent: null
-            }).on('uploadProgress', (progress) => {
-              console.log(progress);
-            });
-            const result = JSON.parse(response.body);
-            if (result.success !== undefined && result.success) {
-              console.log("Upload successful!");
-              console.log("Waiting for reboot...");
-              setTimeout(function() {
-                console.log("Try to reconnect...");
-              }, 120000);
-            } else {
-              console.log("Upload failed:");
-              console.log(response.body);
-              console.log(result);
-            }
-          } catch (error) {
-            console.log(error);
-            //=> 'Internal server error ...'
+        session.cookies.get({
+          url: 'http://' + host
+        }, function(error, cookies) {
+          for (var i = 0; i < cookies.length; i++) {
+            let info = cookies[i];
+            cookieJar.setCookie(`${info.name}=${info.value};`, 'http://' + host, () => {});
+            console.log(info.name, info.value);
           }
-        })();
 
+          console.log("Uploading firmware...");
+
+          (async () => {
+            try {
+              const response = await got.post('/modals/gateway-modal.lp?action=upgradefw', {
+                cookieJar: cookieJar,
+                baseUrl: 'http://' + host,
+                body: form,
+                agent: null
+              }).on('uploadProgress', (progress) => {
+                console.log(progress);
+              });
+              const result = JSON.parse(response.body);
+              if (result.success !== undefined && result.success) {
+                console.log("Upload successful!");
+                console.log("Waiting for reboot...");
+                setTimeout(function() {
+                  console.log("Try to reconnect...");
+                  (async () => {
+                    await got('http://' + host, {
+                      retry: {
+                        retries: (retry, error) => {
+                          console.log('Retry #' + retry + ', waiting...')
+                          return 5000;
+                        }
+                      }
+                    });
+                    console.log("Ready to continue!");
+                    //TODO continue
+                  })();
+                }, 120000);
+              } else {
+                console.log("Upload failed:");
+                console.log(response.body);
+                console.log(result);
+              }
+            } catch (error) {
+              console.log(error);
+              //=> 'Internal server error ...'
+            }
+          })();
+
+        });
       });
     }
   });
