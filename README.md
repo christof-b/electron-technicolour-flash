@@ -4,7 +4,7 @@ An [Electron runtime](http://electron.atom.io) based flash tool for Technicolour
 
 Based on [electron-boilerplate](https://github.com/szwacz/electron-boilerplate) and inspired by [autoflashgui](https://github.com/mswhirl/autoflashgui).
 
-**IMPORTANT: I don't take any warranty. Use this tool at you own risk!**
+**IMPORTANT: I don't offer any warranty for damages caused by this program (neither me nor the deps authors are perfect...). Use this tool at you own risk!**
 
 # Current state
 The tool is currently under developement and first alpha is released,
