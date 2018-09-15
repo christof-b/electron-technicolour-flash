@@ -4,6 +4,20 @@ An [Electron runtime](http://electron.atom.io) based flash tool for Technicolour
 
 Based on [electron-boilerplate](https://github.com/szwacz/electron-boilerplate) and inspired by [autoflashgui](https://github.com/mswhirl/autoflashgui).
 
+**IMPORTANT: I don't take any warranty. Use this tool at you own risk!**
+
+# Current state
+The tool is currently under developement and first alpha is released,
+able to flash selected firmware. Testet on DGA4132 only.
+
+## Next steps:
+* Make app releasable (please use quick start for now)
+* Implement feature to root device
+* Implement ssh client for further commands
+* Improve GUI to provide full featureset of autoflashgui
+...
+* Create a easy to use solution based on further dev
+
 # Quick start
 
 Make sure you have [Node.js](https://nodejs.org) installed, then type the following commands known to every Node developer...
