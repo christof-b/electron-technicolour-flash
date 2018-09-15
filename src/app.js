@@ -14,12 +14,17 @@ import {
   remote
 } from "electron";
 
+const ipc = electron.ipcRenderer;
+
 const dialog = remote.dialog;
 const fs = remote.require('fs');
 const appPath = process.env.NODE_ENV === 'production' ? remote.app.getAppPath() : __dirname;
 
-
-import request from "request";
+import got from "got";
+import FormData from "form-data";
+import {
+  CookieJar
+} from 'tough-cookie';
 
 jquery('#start-button').click(function(ev) {
   ev.preventDefault();
@@ -74,53 +79,54 @@ jquery('#run').click(function(ev) {
       const firmware = 'AGTHP_1.1.0_CLOSED.rbi';
       const firmwarePath = appPath + '/firmware/' + firmware;
       const stats = fs.statSync(firmwarePath);
+
+      console.log(stats);
+
+      const form = new FormData();
+      form.append('CSRFtoken', token);
+      form.append('upgradefile', fs.createReadStream(firmwarePath));
+      const cookieJar = new CookieJar();
       let session = webview.getWebContents().session;
-      let requestSession = request.jar();
 
       session.cookies.get({
         url: 'http://' + host
       }, function(error, cookies) {
-        console.log(cookies);
-        let cookieStr = ''
         for (var i = 0; i < cookies.length; i++) {
           let info = cookies[i];
-          requestSession.setCookie(request.cookie(`${info.name}=${info.value};`), 'http://' + host, {});
-          console.log(info.value, info.name);
+          cookieJar.setCookie(`${info.name}=${info.value};`, 'http://' + host, () => {});
+          console.log(info.name, info.value);
         }
 
         console.log("Uploading firmware...");
 
-        request({
-            jar: requestSession,
-            url: 'http://' + host + '/modals/gateway-modal.lp?action=upgradefw',
-            method: 'POST',
-            formData: {
-              'CSRFtoken': token,
-              'upgradefile': fs.createReadStream(firmwarePath, {
-                flags: 'r'
-              })
-            }
-          },
-          function(err, response, body) {
-            if (err == null && /success/.test(body)) {
-              console.log("Flashing...");
+        (async () => {
+          try {
+            const response = await got.post('/modals/gateway-modal.lp?action=upgradefw', {
+              cookieJar: cookieJar,
+              baseUrl: 'http://' + host,
+              body: form,
+              agent: null
+            }).on('uploadProgress', (progress) => {
+              console.log(progress);
+            });
+            const result = JSON.parse(response.body);
+            if (result.success !== undefined && result.success) {
+              console.log("Upload successful!");
+              console.log("Waiting for reboot...");
               setTimeout(function() {
                 console.log("Try to reconnect...");
-                request
-                  .get('http://' + host)
-                  .on('error', function(err) {
-                    //TODO wait for 5s and repeat
-                  })
-                  .on('response', function(response) {
-                    //TODO continue flashing
-                  })
               }, 120000);
             } else {
-              console.log("Flashing failed:");
-              console.log(err);
-              console.log(body);
+              console.log("Upload failed:");
+              console.log(response.body);
+              console.log(result);
             }
-          });
+          } catch (error) {
+            console.log(error);
+            //=> 'Internal server error ...'
+          }
+        })();
+
       });
     }
   });
