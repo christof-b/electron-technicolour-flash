@@ -2,7 +2,7 @@
   "name": "electron-technicolour-flash",
   "productName": "Electron Technicolour Flash",
   "description": "Flash tool for Technicolour modems",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "author": "Christof Bachhmann <code@christof-b.de>",
   "copyright": "© 2018, Christof Bachmann",
@@ -28,7 +28,7 @@
     "e2e": "mocha temp/e2e.js --require source-map-support/register",
     "test": "npm run unit && npm run e2e",
     "start": "node build/start.js",
-    "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder"
+    "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl"
   },
   "dependencies": {
     "ajv": "^6.5.3",

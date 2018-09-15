@@ -16,7 +16,6 @@ import {
 
 const dialog = remote.dialog;
 const fs = remote.require('fs');
-const appPath = process.env.NODE_ENV === 'production' ? remote.app.getAppPath() : __dirname;
 
 import got from "got";
 import FormData from "form-data";
@@ -25,6 +24,7 @@ import {
 } from 'tough-cookie';
 
 import path from 'path';
+import env from "env";
 
 jquery('#start-button').click(function(ev) {
   ev.preventDefault();
@@ -54,7 +54,7 @@ jquery('#run').click(function(ev) {
     if (/login/.test(webview.getURL())) {
       if (tries === 0) {
         tries++;
-        fs.readFile(appPath + '/webview/login.js', 'utf8', (err, data) => {
+        fs.readFile(path.join(__dirname, '/webview/login.js'), 'utf8', (err, data) => {
           if (err) throw err;
           data = data.replace(/##username##/gi, username);
           data = data.replace(/##password##/gi, password);
@@ -74,7 +74,7 @@ jquery('#run').click(function(ev) {
     if (e.channel === "csrf-token-response") {
       const token = e.args[0];
       const firmware = jquery('#inputFirmwareFileName').val();
-      const firmwarePath = appPath + path.sep + 'firmware' + path.sep + firmware;
+      const firmwarePath = path.join(__dirname, '/firmware/' + firmware);
 
       const stats = fs.statSync(firmwarePath);
       console.log(stats);
@@ -148,12 +148,14 @@ jquery('#run').click(function(ev) {
     }
   });
 
-  if (env.name !== "development") {
-    jquery('webview').hide();
-  }
+
   jquery('#app').append('<div class="jumbotron mt-4" id="progress"><h1>Progress</h1><p class="text-info">Loading firmware...</p></div>');
 
   webview.loadURL('http://' + host + '/login.lp');
-})
+});
+
+if (env.name === "development") {
+  jquery('webview').css('height', '400px');
+}
 
 jquery('#app').show();
