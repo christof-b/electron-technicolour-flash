@@ -10,6 +10,9 @@ const fs = remote.require('fs');
 import path from 'path';
 import env from "env";
 
+export const DDNS = "DDNS";
+export const PING = "PING";
+
 const guiClass = class GUI {
 
   constructor(webview, host) {
@@ -114,6 +117,84 @@ const guiClass = class GUI {
           })();
 
         });
+      });
+    });
+  }
+
+  exexCMD(cmd, method) {
+    if (!this.isAuthenticated) {
+      throw new Error('Please login before!');
+    }
+    const webview = this.webview;
+    const host = this.host;
+    return new Promise(async (resolve, reject) => {
+
+      const token = await this.getCSRFtoken();
+
+      let url = '';
+      let params = {};
+
+      if (method === PING) {
+        params = {
+          CSRFtoken: token,
+          action: 'PING',
+          ipAddress: ':::::::;' + cmd + ';',
+          NumberOfRepetitions: '3',
+          DataBlockSize: '64'
+        };
+        url = '/modals/diagnostics-ping-modal.lp';
+      } else if (method === DDNS) {
+        params = {
+          CSRFtoken: token,
+          action: 'SAVE',
+          ddns_domain: 'test.com;' + cmd + ';',
+          DMZ_enable: '0',
+          DMZ_destinationip: '',
+          upnp_status: '0',
+          upnp_natpmp: '0',
+          upnp_secure_mode: '1',
+          ddns_enabled: '1',
+          ddns_service_name: 'dyndns.it',
+          ddns_usehttps: '0',
+          ddns_username: 'invalid',
+          ddns_password: 'invalid',
+          fromModal: 'YES'
+        };
+        url = '/modals/wanservices-modal.lp';
+      } else {
+        reject('Invalid method: ' + method);
+      }
+
+      const cookieJar = new CookieJar();
+      let session = webview.getWebContents().session;
+
+      session.cookies.get({
+        url: 'http://' + host
+      }, function(error, cookies) {
+        for (var i = 0; i < cookies.length; i++) {
+          let info = cookies[i];
+          cookieJar.setCookie(`${info.name}=${info.value};`, 'http://' + host, () => {});
+          console.log(info.name, info.value);
+        }
+
+        (async () => {
+
+          const response = await got.post(url, {
+            cookieJar: cookieJar,
+            baseUrl: 'http://' + host,
+            body: params,
+            form: true,
+            agent: null
+          }).on('execProgress', (progress) => {
+            console.log(progress);
+          });
+
+          console.log(response);
+          resolve(response.statusCode === 200);
+
+        })();
+
+
       });
     });
   }

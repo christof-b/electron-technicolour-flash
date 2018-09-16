@@ -8,6 +8,10 @@ import "./helpers/external_links.js";
 import "../node_modules/bootstrap/dist/js/bootstrap.bundle.js"
 import "../node_modules/bootstrap/dist/css/bootstrap.css"
 import GUI from "./technicolour/GUI"
+import {
+  PING,
+  DDNS
+} from "./technicolour/GUI"
 import jquery from "jquery";
 import got from "got";
 import sleep from "./helpers/sleep";
@@ -127,8 +131,26 @@ jquery('#run').click(async (ev) => {
 
       if (jquery('#inputRootDevice').is(':checked')) {
         jquery('#progress').append('<p class="text-info">Start rooting of device...</p>');
-        //TODO root device
+        const commands = jquery('#inputSplitCommand').is(':checked') ? jquery('#inputCommand').val().split(';') : [jquery('#inputCommand').val()];
+        console.log(commands);
+        for (let i = 0; i < commands.length; i++) {
+          const cmd = commands[i];
+          jquery('#progress').append('<p class="text-mute">Exec "' + cmd + '"...</p>');
+          const result = await gui.exexCMD(cmd, jquery('#inputRootMethod').val());
+          if (result !== true) {
+            throw new Error('Failed to exec: ' + cmd);
+          }
+          await sleep(5000);
+        }
+
       }
+
+      //TODO scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null dga4132_unlocked.tar.gz root@192.168.1.1:/tmp
+      //TODO ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1
+      //TODO - tar -zxvf /tmp/dga4132_unlocked.tar.gz -C /
+      //TODO - /etc/init.d/rootdevice force
+      //TODO - /etc/init.d/rootdevice force
+      //TODO - reboot
 
       jquery('#progress').append('<p class="text-success">Done!</p>');
 

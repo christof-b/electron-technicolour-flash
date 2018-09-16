@@ -26,7 +26,7 @@
             <div class="form-group col-md-6">
               <label for="inputType">Type</label>
               <select class="form-control" id="inputType">
-                  <option value="telstra">TG799/TG797 Telstra</option>
+                  <!--<option value="telstra">TG799/TG797 Telstra</option>
                   <option value="iinet">iiNet</option>
                   <option value="myrepublic">MyRepublic</option>
                   <option value="tiscali">Tiscali</option>
@@ -34,6 +34,8 @@
                     <option value="dga4130-non-root">DGA4130 AGTEF 1.0.3 Root inactive</option>
                     <option value="dga4132-root" selected>DGA4132 AGTHP 1.0.3</option>
                     <option value="dga4132-non-root">DGA4132 AGTHP 1.0.3 Root inactive</option>
+                -->
+                <option value="dga4132">DGA4132 AGTHP</option>
                 </select>
             </div>
             <div class="form-group col-md-6">
@@ -67,7 +69,7 @@
               <label for="inputFirmwareFileName">File Name</label>
               <select class="form-control" id="inputFirmwareFileName">
                   <option value="AGTHP_1.0.2_CLOSED.rbi">AGTHP_1.0.2_CLOSED.rbi</option>
-                  <option value="AGTHP_1.0.4_CLOSED.rbi">AGTHP_1.0.3_CLOSED.rbi</option>
+                  <option value="AGTHP_1.0.3_CLOSED.rbi">AGTHP_1.0.3_CLOSED.rbi</option>
                   <option value="AGTHP_1.0.5_CLOSED.rbi">AGTHP_1.0.5_CLOSED.rbi</option>
                   <option value="AGTHP_1.0.6_001_CLOSED.rbi">AGTHP_1.0.6_001_CLOSED.rbi</option>
                   <option value="AGTHP_1.1.0_CLOSED.rbi" selected>AGTHP_1.1.0_CLOSED.rbi</option>
@@ -76,7 +78,7 @@
             </div>
           </div>
         </fieldset>
-        <!--
+
         <fieldset class="form-group">
           <legend>Root</legend>
           <div class="form-row">
@@ -91,13 +93,13 @@
             <div class="form-group col-md-6">
               <label for="inputRootMethod">Method</label>
               <select class="form-control" id="inputRootMethod">
-                  <option value="ping">PING</option>
-                  <option value="ddns" selected>DDNS</option>
+                  <option value="PING">PING</option>
+                  <option value="DDNS" selected>DDNS</option>
                   </select>
             </div>
             <div class="form-group col-md-6">
               <label for="inputDDNS">DynDNS Service</label>
-              <input type="text" class="form-control" id="inputDDNS" placeholder="DynDNS Service" value="dyndns.it">
+              <input type="text" class="form-control" id="inputDDNS" placeholder="DynDNS Service" value="dyndns.it" readonly="readonly">
             </div>
           </div>
           <div class="form-row">
@@ -124,7 +126,7 @@
             </div>
           </div>
         </fieldset>
-    -->
+
 
         <button type="submit" class="btn btn-primary" id="run">Run</button>
       </form>
