@@ -51,21 +51,33 @@ jquery('#run').click(async (ev) => {
 
   const gui = new GUI(document.querySelector('#client'), host);
 
+  let authenticated = false;
+
   jquery('#progress').append('<p class="text-info">Authenticating...</p>');
-  const loginResult = await gui.login(username, password);
-  if (loginResult !== true) {
+  try {
+    const loginResult = await gui.login(username, password);
+    if (loginResult !== true) {
+      jquery('#back').html('back');
+      jquery('#progress').append('<p class="text-danger">Auth failed!</p>');
+    } else {
+      authenticated = true;
+      jquery('#progress').append('<p class="text-success">Auth successful</p>');
+    }
+  } catch (err) {
+    console.log(err);
     jquery('#back').html('back');
-    jquery('#progress').append('<p class="text-danger">Auth failed!</p>');
-  } else {
-    jquery('#progress').append('<p class="text-success">Auth successful</p>');
+    jquery('#progress').append('<p class="text-danger">' + err + '</p>');
+  }
 
-    jquery('#progress').append('<p class="text-info">Loading firmware...</p>');
-
-    const firmware = jquery('#inputFirmwareFileName').val();
-    const firmwarePath = path.join(__dirname, '/firmware/' + firmware);
+  if (authenticated) {
 
     try {
       if (jquery('#inputFlashFirmware').is(':checked')) {
+
+        jquery('#progress').append('<p class="text-info">Loading firmware...</p>');
+
+        const firmware = jquery('#inputFirmwareFileName').val();
+        const firmwarePath = path.join(__dirname, '/firmware/' + firmware);
 
         jquery('#progress').append('<p class="text-info">Uploading firmware...</p>');
 

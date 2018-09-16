@@ -22,8 +22,11 @@ const guiClass = class GUI {
   login(username, password) {
     const webview = this.webview;
     const host = this.host;
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       let tries = 0;
+      webview.addEventListener('did-fail-load', (event) => {
+        reject('Failed to reach host...');
+      });
       webview.addEventListener('did-finish-load', (event) => {
         if (/login/.test(webview.getURL())) {
           if (tries === 0) {
