@@ -37,6 +37,31 @@ jquery('#inputChangeCommand').click(function() {
   }
 });
 
+function doLogin(gui) {
+  return new Promise(async (resolve, reject) => {
+    const username = jquery('#inputUsername').val();
+    const password = jquery('#inputPassword').val();
+
+    jquery('#progress').append('<p class="text-info">Authenticating...</p>');
+
+    try {
+      const loginResult = await gui.login(username, password);
+      if (loginResult !== true) {
+        jquery('#back').html('back');
+        jquery('#progress').append('<p class="text-danger">Auth failed!</p>');
+      } else {
+        resolve(true);
+        jquery('#progress').append('<p class="text-success">Auth successful</p>');
+      }
+    } catch (err) {
+      console.log(err);
+      jquery('#back').html('back');
+      jquery('#progress').append('<p class="text-danger">' + err + '</p>');
+    }
+    resolve(false);
+  });
+}
+
 jquery('#run').click(async (ev) => {
   ev.preventDefault();
   jquery('#form').hide();
@@ -45,33 +70,14 @@ jquery('#run').click(async (ev) => {
     location.reload();
   });
 
-  const username = jquery('#inputUsername').val();
-  const password = jquery('#inputPassword').val();
   const host = jquery('#inputTargetIP').val();
 
-  const gui = new GUI(document.querySelector('#client'), host);
-
-  let authenticated = false;
-
-  jquery('#progress').append('<p class="text-info">Authenticating...</p>');
   try {
-    const loginResult = await gui.login(username, password);
-    if (loginResult !== true) {
-      jquery('#back').html('back');
-      jquery('#progress').append('<p class="text-danger">Auth failed!</p>');
-    } else {
-      authenticated = true;
-      jquery('#progress').append('<p class="text-success">Auth successful</p>');
-    }
-  } catch (err) {
-    console.log(err);
-    jquery('#back').html('back');
-    jquery('#progress').append('<p class="text-danger">' + err + '</p>');
-  }
+    const gui = new GUI(document.querySelector('#client'), host);
 
-  if (authenticated) {
+    let authenticated = await doLogin(gui);
 
-    try {
+    if (authenticated) {
       if (jquery('#inputFlashFirmware').is(':checked')) {
 
         jquery('#progress').append('<p class="text-info">Loading firmware...</p>');
@@ -100,8 +106,14 @@ jquery('#run').click(async (ev) => {
             }
           });
 
-          jquery('#progress').append('<p class="text-success">Flash successfull!</p>');
-          jquery('#back').html('back');
+          authenticated = await doLogin(gui);
+          if (authenticated) {
+            jquery('#progress').append('<p class="text-success">Flash successfull!</p>');
+          } else {
+            jquery('#back').html('back');
+            jquery('#progress').append('<p class="text-danger">Failed to reauth!</p>');
+            throw new Error('Failed to reauth');
+          }
 
         } else {
           jquery('#back').html('back');
@@ -115,16 +127,18 @@ jquery('#run').click(async (ev) => {
 
       jquery('#progress').append('<p class="text-success">Ready to continue...</p>');
       //TODO root device
-
-    } catch (error) {
       jquery('#back').html('back');
-      jquery('#back').removeAttr('disabled');
-      jquery('#progress').append('<p class="text-danger">An error occured!</p>');
-      console.log(error);
-      //=> 'Internal server error ...'
     }
 
+  } catch (error) {
+    jquery('#back').html('back');
+    jquery('#back').removeAttr('disabled');
+    jquery('#progress').append('<p class="text-danger">An error occured!</p>');
+    console.log(error);
+    //=> 'Internal server error ...'
   }
+
+
 
 });
 
