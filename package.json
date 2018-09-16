@@ -2,7 +2,7 @@
   "name": "electron-technicolour-flash",
   "productName": "Electron Technicolour Flash",
   "description": "Flash tool for Technicolour modems",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "author": "Christof Bachhmann <code@christof-b.de>",
   "copyright": "© 2018, Christof Bachmann",
