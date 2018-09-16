@@ -6,13 +6,11 @@ Based on [electron-boilerplate](https://github.com/szwacz/electron-boilerplate) 
 
 **IMPORTANT: I don't offer any warranty for damages caused by this program (neither me nor the deps authors are perfect...). Use this tool at you own risk!**
 
-# Current state [alpha]
-The tool is currently under developement and first alpha is released,
-able to flash selected firmware. Testet on DGA4132 only.
+# Current state [beta]
+The tool is able to flash selected firmware and root device.
+Testet on DGA4132 only.
 
 ## Next steps:
-* Implement feature to root device
-* Implement ssh client for further commands
 * Improve GUI to provide full featureset of autoflashgui
 ...
 * Create a easy to use solution based on further dev
