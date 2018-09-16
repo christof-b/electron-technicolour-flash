@@ -89,7 +89,7 @@ jquery('#run').click(async (ev) => {
           jquery('#progress').append('<p class="text-success">Upload successful!</p>');
 
           jquery('#progress').append('<p class="text-info">Waiting for reboot...</p>');
-          await sleep(12000);
+          await sleep(120000);
           jquery('#progress').append('<p class="text-info">Try to reconnect...</p>');
           await got('http://' + host, {
             retry: {
