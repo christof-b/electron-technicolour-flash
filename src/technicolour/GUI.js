@@ -26,31 +26,24 @@ const guiClass = class GUI {
       let tries = 0;
       webview.addEventListener('did-fail-load', (event) => {
         reject('Failed to reach host...');
+      }, {
+        once: true
       });
       webview.addEventListener('did-finish-load', (event) => {
         if (/login/.test(webview.getURL())) {
-          if (tries === 0) {
-            tries++;
-            fs.readFile(path.join(__dirname, '/webview/login.js'), 'utf8', (err, data) => {
-              if (err) throw err;
-              data = data.replace(/##username##/gi, username);
-              data = data.replace(/##password##/gi, password);
-              webview.executeJavaScript(data);
-            });
-          } else {
-            console.log('Auth failed.');
-            resolve(false);
-          }
-        } else {
-          console.log('Auth successful.');
-          this.isAuthenticated = true;
-          resolve(true);
+          webview.send('login-request', username, password);
         }
+      }, {
+        once: true
       });
       webview.addEventListener('ipc-message', (event) => {
         if (event.channel === "login-failed") {
           console.log('Auth failed.');
           resolve(false);
+        } else if (event.channel === "loggedin") {
+          console.log('Auth successful.');
+          this.isAuthenticated = true;
+          resolve(true);
         }
       });
       if (env.name === "development") {
