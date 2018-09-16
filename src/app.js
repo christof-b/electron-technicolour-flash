@@ -10,6 +10,7 @@ import "../node_modules/bootstrap/dist/css/bootstrap.css"
 import GUI from "./technicolour/GUI"
 import jquery from "jquery";
 import got from "got";
+import sleep from "./helpers/sleep";
 
 import {
   remote
@@ -49,7 +50,6 @@ jquery('#run').click(async (ev) => {
   const host = jquery('#inputTargetIP').val();
 
   const gui = new GUI(document.querySelector('#client'), host);
-  console.log(gui);
 
   jquery('#progress').append('<p class="text-info">Authenticating...</p>');
   const loginResult = await gui.login(username, password);
@@ -63,38 +63,46 @@ jquery('#run').click(async (ev) => {
     const firmware = jquery('#inputFirmwareFileName').val();
     const firmwarePath = path.join(__dirname, '/firmware/' + firmware);
 
-    jquery('#progress').append('<p class="text-info">Uploading firmware...</p>');
-
     try {
-      jquery('#back').attr('disabled', 'disabled');
-      const result = await gui.uploadFirmware(firmwarePath);
-      jquery('#back').removeAttr('disabled');
+      if (jquery('#inputFlashFirmware').is(':checked')) {
 
-      if (result.success !== undefined && result.success) {
-        jquery('#progress').append('<p class="text-success">Upload successful!</p>');
-        jquery('#progress').append('<p class="text-info">Waiting for reboot...</p>');
-        setTimeout(function() {
+        jquery('#progress').append('<p class="text-info">Uploading firmware...</p>');
+
+        jquery('#back').attr('disabled', 'disabled');
+        const result = await gui.uploadFirmware(firmwarePath);
+        jquery('#back').removeAttr('disabled');
+
+        if (result.success !== undefined && result.success) {
+          jquery('#progress').append('<p class="text-success">Upload successful!</p>');
+
+          jquery('#progress').append('<p class="text-info">Waiting for reboot...</p>');
+          await sleep(12000);
           jquery('#progress').append('<p class="text-info">Try to reconnect...</p>');
-          (async () => {
-            await got('http://' + host, {
-              retry: {
-                retries: (retry, error) => {
-                  jquery('#progress').append('<p class="text-mute">Retry #' + retry + ', waiting...</p>')
-                  return 5000;
-                }
+          await got('http://' + host, {
+            retry: {
+              retries: (retry, error) => {
+                jquery('#progress').append('<p class="text-mute">Retry #' + retry + ', waiting...</p>')
+                return 5000;
               }
-            });
-            jquery('#progress').append('<p class="text-success">Ready to continue!</p>');
-            //TODO continue
-            jquery('#back').html('back');
-          })();
-        }, 120000);
-      } else {
-        jquery('#back').html('back');
-        jquery('#progress').append('<p class="text-danger">Upload failed!</p>');
-        console.log(response.body);
-        console.log(result);
+            }
+          });
+
+          jquery('#progress').append('<p class="text-success">Flash successfull!</p>');
+          jquery('#back').html('back');
+
+        } else {
+          jquery('#back').html('back');
+          jquery('#progress').append('<p class="text-danger">Upload failed!</p>');
+          console.log(response.body);
+          console.log(result);
+          throw new Error(response);
+        }
+
       }
+
+      jquery('#progress').append('<p class="text-success">Ready to continue...</p>');
+      //TODO root device
+
     } catch (error) {
       jquery('#back').html('back');
       jquery('#back').removeAttr('disabled');
