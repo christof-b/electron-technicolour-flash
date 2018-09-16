@@ -125,8 +125,13 @@ jquery('#run').click(async (ev) => {
 
       }
 
-      jquery('#progress').append('<p class="text-success">Ready to continue...</p>');
-      //TODO root device
+      if (jquery('#inputRootDevice').is(':checked')) {
+        jquery('#progress').append('<p class="text-info">Start rooting of device...</p>');
+        //TODO root device
+      }
+
+      jquery('#progress').append('<p class="text-success">Done!</p>');
+
       jquery('#back').html('back');
     }
 

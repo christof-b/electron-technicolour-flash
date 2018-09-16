@@ -56,6 +56,14 @@
           <legend>Firmware</legend>
           <div class="form-row">
             <div class="form-group col-md-12">
+              <div class="form-check">
+                <input type="checkbox" id="inputFlashFirmware" checked value="1">
+                <label for="inputFlashFirmware">Flash Firmware</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-12">
               <label for="inputFirmwareFileName">File Name</label>
               <select class="form-control" id="inputFirmwareFileName">
                   <option value="AGTHP_1.0.2_CLOSED.rbi">AGTHP_1.0.2_CLOSED.rbi</option>
@@ -67,18 +75,18 @@
               </select>
             </div>
           </div>
+        </fieldset>
+        <!--
+        <fieldset class="form-group">
+          <legend>Root</legend>
           <div class="form-row">
             <div class="form-group col-md-12">
               <div class="form-check">
-                <input type="checkbox" id="inputFlashFirmware" checked value="1">
-                <label for="inputFlashFirmware">Flash Firmware</label>
+                <input type="checkbox" id="inputRootDevice" checked value="1">
+                <label for="inputRootDevice">Enable Root (Requires firmware 1.0.3!)</label>
               </div>
             </div>
           </div>
-        </fieldset>
-
-        <fieldset class="form-group">
-          <legend>Root</legend>
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="inputRootMethod">Method</label>
@@ -116,6 +124,7 @@
             </div>
           </div>
         </fieldset>
+    -->
 
         <button type="submit" class="btn btn-primary" id="run">Run</button>
       </form>
