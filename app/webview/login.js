@@ -4,6 +4,6 @@ $(function() {
     $('input[type=password]').first().val('##password##');
     $('#sign-me-in').click();
   } else {
-    alert(window.location.href);
+    console.log('Unknown location: ' + window.location.href);
   }
 });

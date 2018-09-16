@@ -35,15 +35,27 @@ const guiClass = class GUI {
               webview.executeJavaScript(data);
             });
           } else {
+            console.log('Auth failed.');
             resolve(false);
           }
         } else {
+          console.log('Auth successful.');
           this.isAuthenticated = true;
           resolve(true);
         }
       });
+      webview.addEventListener('ipc-message', (event) => {
+        if (event.channel === "login-failed") {
+          console.log('Auth failed.');
+          resolve(false);
+        }
+      });
+      if (env.name === "development") {
+        webview.openDevTools();
+      }
       webview.loadURL('http://' + host + '/login.lp');
     });
+
   }
 
   getCSRFtoken() {

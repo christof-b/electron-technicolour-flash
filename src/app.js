@@ -54,6 +54,7 @@ jquery('#run').click(async (ev) => {
   jquery('#progress').append('<p class="text-info">Authenticating...</p>');
   const loginResult = await gui.login(username, password);
   if (loginResult !== true) {
+    jquery('#back').html('back');
     jquery('#progress').append('<p class="text-danger">Auth failed!</p>');
   } else {
     jquery('#progress').append('<p class="text-success">Auth successful</p>');
