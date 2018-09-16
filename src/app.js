@@ -104,6 +104,7 @@ jquery('#run').click(function(ev) {
 
           (async () => {
             try {
+              jquery('#back').attr('disabled', 'disabled');
               const response = await got.post('/modals/gateway-modal.lp?action=upgradefw', {
                 cookieJar: cookieJar,
                 baseUrl: 'http://' + host,
@@ -112,6 +113,7 @@ jquery('#run').click(function(ev) {
               }).on('uploadProgress', (progress) => {
                 console.log(progress);
               });
+              jquery('#back').removeAttr('disabled');
               const result = JSON.parse(response.body);
               if (result.success !== undefined && result.success) {
                 jquery('#progress').append('<p class="text-success">Upload successful!</p>');
@@ -129,14 +131,18 @@ jquery('#run').click(function(ev) {
                     });
                     jquery('#progress').append('<p class="text-success">Ready to continue!</p>');
                     //TODO continue
+                    jquery('#back').html('back');
                   })();
                 }, 120000);
               } else {
+                jquery('#back').html('back');
                 jquery('#progress').append('<p class="text-danger">Upload failed!</p>');
                 console.log(response.body);
                 console.log(result);
               }
             } catch (error) {
+              jquery('#back').html('back');
+              jquery('#back').removeAttr('disabled');
               jquery('#progress').append('<p class="text-danger">An error occured!</p>');
               console.log(error);
               //=> 'Internal server error ...'
@@ -149,8 +155,10 @@ jquery('#run').click(function(ev) {
   });
 
 
-  jquery('#app').append('<div class="jumbotron mt-4" id="progress"><h1>Progress</h1><p class="text-info">Loading firmware...</p></div>');
-
+  jquery('#app').append('<div class="jumbotron mt-4" id="progress"><h1>Progress</h1><p class="text-info">Loading firmware...</p></div><button type="button" class="btn btn-primary" id="back">cancel</button>');
+  jquery('#back').click(() => {
+    location.reload();
+  });
   webview.loadURL('http://' + host + '/login.lp');
 });
 
